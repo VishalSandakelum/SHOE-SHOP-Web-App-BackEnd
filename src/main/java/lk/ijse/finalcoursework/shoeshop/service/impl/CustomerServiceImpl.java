@@ -4,6 +4,7 @@ import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Customer;
 import lk.ijse.finalcoursework.shoeshop.persistence.repository.CustomerRepository;
 import lk.ijse.finalcoursework.shoeshop.service.CustomerService;
+import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getCustomerDetails(String id) {
-        return null;
+        if(!customerRepository.existsById(id)){
+            throw  new NotFoundException("Customer ID"+ id + "Not Found...");
+        }
+        return customerRepository.findById(id).map(
+                customer -> modelMapper.map(customer, CustomerDTO.class)
+        ).get();
     }
 
     @Override
@@ -45,11 +51,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(String id, CustomerDTO customerDTO) {
-        return;
+        if(!customerRepository.existsById(id)){
+            throw  new NotFoundException("Customer ID"+ customerDTO.getCustomerCode() + "Not Found...");
+        }
+        customerRepository.save(modelMapper.map(customerDTO, Customer.class));
     }
 
     @Override
     public void deleteCustomer(String id) {
-
+        if(!customerRepository.existsById(id)){
+            throw  new NotFoundException("Customer ID"+ id + "Not Found...");
+        }
+        customerRepository.deleteById(id);
     }
 }
