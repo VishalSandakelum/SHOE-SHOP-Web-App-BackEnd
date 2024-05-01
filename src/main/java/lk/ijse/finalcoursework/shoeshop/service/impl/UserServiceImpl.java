@@ -9,6 +9,8 @@ import lk.ijse.finalcoursework.shoeshop.service.UserService;
 import lk.ijse.finalcoursework.shoeshop.service.execption.DublicateRecordException;
 import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDetailsService userDetailService() {
+        return username -> userRepository.findByEmail(username)
+                .orElseThrow(() -> new
+                        UsernameNotFoundException(
+                        "user not found"));
+    }
+
+    @Override
     public List<UserDTO> getAllUser() {
         return userRepository.findAll().stream().map(
                 user -> modelMapper.map(user, UserDTO.class)
@@ -38,11 +48,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserDetails(String email) {
+    public UserDTO getUserDetails(String email,String role) {
         if(!userRepository.existsByEmail(email)){
             throw new NotFoundException("User email :"+email+" Not Found!");
         }
-        return modelMapper.map(userRepository.findByEmail(email), UserDTO.class);
+        return modelMapper.map(userRepository.findByEmailAndRole(email,role), UserDTO.class);
     }
 
     @Override
@@ -57,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(String email, UserDTO userDTO) {
-        User existingUser = userRepository.findByEmail(email);
+        User existingUser = userRepository.findByEmailAndRole(email, String.valueOf(userDTO.getRole()));
 
         if(existingUser.getPassword().isEmpty()){
             throw new NotFoundException("User email :"+ email + "Not Found...");

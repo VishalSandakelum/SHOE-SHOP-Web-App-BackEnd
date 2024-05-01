@@ -10,9 +10,6 @@ import java.util.Optional;
  * @Runtime version: 11.0.11+9-b1341.60 amd64
  **/
 
-public interface UserRepository extends JpaRepository<User,String> {
-    Boolean existsByEmail(String email);
-    User findByEmailAndRole(String email,String role);
-    void deleteByEmail(String email);
+public interface SecurityRepository extends JpaRepository<User,String> {
     Optional<User> findByEmail(String email);
 }

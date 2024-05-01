@@ -47,9 +47,9 @@ public class UserAPI {
         userService.deleteUser(userDTO.getEmail());
     }
 
-    @PatchMapping(value = "/{email}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{email}/{role}",consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    UserDTO getCustomer(@PathVariable("email") String email){
-        return userService.getUserDetails(email);
+    UserDTO getCustomer(@PathVariable("email") String email, @PathVariable("role") String role){
+        return userService.getUserDetails(email ,role);
     }
 }
