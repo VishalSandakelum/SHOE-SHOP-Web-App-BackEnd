@@ -1,5 +1,6 @@
 package lk.ijse.finalcoursework.shoeshop.api;
 
+import jakarta.validation.Valid;
 import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
 import lk.ijse.finalcoursework.shoeshop.service.CustomerService;
 import org.springframework.http.HttpStatus;
@@ -29,13 +30,13 @@ public class CustomerAPI {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
+    CustomerDTO saveCustomer(@Valid @RequestBody CustomerDTO customerDTO){
         return customerService.saveCustomer(customerDTO);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void updateCustomer(@RequestBody CustomerDTO customerDTO){
+    void updateCustomer(@Valid @RequestBody CustomerDTO customerDTO){
         customerService.updateCustomer(customerDTO.getCustomerCode(),customerDTO);
     }
 

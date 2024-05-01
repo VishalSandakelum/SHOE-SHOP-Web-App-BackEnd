@@ -26,12 +26,10 @@ public class CustomerDTO {
     @Pattern(regexp = "^[a-zA-Z]+(?:[ '-][a-zA-Z]+)*$\n", message = "Name not valid")
     private String customerName;
     @NotBlank(message = "Customer Gender Cannot Be Null")
-    @Pattern(regexp = "^(?:MALE|FEMALE|OTHER)$\n", message = "Gender not valid")
     private Gender gender;
     @NotBlank(message = "Customer JoinDate Cannot Be Null")
     private Date joinDate;
     @NotBlank(message = "Customer Level Cannot Be Null")
-    @Pattern(regexp = "^(?:GOLD|SILVER|BRONZE|NEW)$\n", message = "Level not valid")
     private Level level;
     @NotBlank(message = "Customer TotalPoints Cannot Be Null")
     @Pattern(regexp = "^[0-9]+$\n", message = "Totat Points not valid")

@@ -17,11 +17,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDTO {
     @NotBlank(message = "Email Cannot Be Null")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\n", message = "Email not valid")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email not valid")
     private String email;
     @NotBlank(message = "Password Cannot Be Null")
     private String password;
-    @NotBlank(message = "Role Cannot Be Null")
-    @Pattern(regexp = "^(?:USER|ADMIN)$\n", message = "Role not valid")
     private Role role;
 }
