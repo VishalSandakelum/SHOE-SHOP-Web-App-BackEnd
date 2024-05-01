@@ -4,9 +4,11 @@ import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Customer;
 import lk.ijse.finalcoursework.shoeshop.persistence.repository.CustomerRepository;
 import lk.ijse.finalcoursework.shoeshop.service.CustomerService;
+import lk.ijse.finalcoursework.shoeshop.service.execption.DublicateRecordException;
 import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
  **/
 
 @Service
+@Transactional
 public class CustomerServiceImpl implements CustomerService {
     CustomerRepository customerRepository;
     ModelMapper modelMapper;
@@ -34,16 +37,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getCustomerDetails(String id) {
-        if(!customerRepository.existsById(id)){
-            throw  new NotFoundException("Customer ID"+ id + "Not Found...");
+        if(!customerRepository.existsByCustomerCode(id)){
+            throw new NotFoundException("Customer "+id+" Not Found!");
         }
-        return customerRepository.findById(id).map(
-                customer -> modelMapper.map(customer, CustomerDTO.class)
-        ).get();
+        return modelMapper.map(customerRepository.findByCustomerCode(id), CustomerDTO.class);
     }
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
+        if(customerRepository.existsByCustomerCode(customerDTO.getCustomerCode())){
+            throw new DublicateRecordException("This Customer "+customerDTO.getCustomerCode()+" already exicts...");
+        }
         return modelMapper.map(customerRepository.save(modelMapper.map(
                 customerDTO, Customer.class)), CustomerDTO.class
         );
@@ -51,17 +55,23 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(String id, CustomerDTO customerDTO) {
-        if(!customerRepository.existsById(id)){
-            throw  new NotFoundException("Customer ID"+ customerDTO.getCustomerCode() + "Not Found...");
+        Customer existingCustomer = customerRepository.findByCustomerCode(id);
+
+        if(existingCustomer.getCustomerName().isEmpty()){
+            throw new NotFoundException("Customer ID"+ id + "Not Found...");
         }
-        customerRepository.save(modelMapper.map(customerDTO, Customer.class));
+
+        existingCustomer.setCustomerName(customerDTO.getCustomerName());
+        existingCustomer.setGender(customerDTO.getGender());
+
+        customerRepository.save(existingCustomer);
     }
 
     @Override
     public void deleteCustomer(String id) {
-        if(!customerRepository.existsById(id)){
+        if(!customerRepository.existsByCustomerCode(id)){
             throw  new NotFoundException("Customer ID"+ id + "Not Found...");
         }
-        customerRepository.deleteById(id);
+        customerRepository.deleteByCustomerCode(id);
     }
 }

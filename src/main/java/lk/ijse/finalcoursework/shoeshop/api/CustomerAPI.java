@@ -24,27 +24,30 @@ public class CustomerAPI {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     List<CustomerDTO> getAllCustomer(){
-        return null;
+        return customerService.getAllCustomers();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
-        System.out.println(customerDTO);
-        return null;
+        return customerService.saveCustomer(customerDTO);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    CustomerDTO updateCustomer(@RequestBody CustomerDTO customerDTO){
-        System.out.println(customerDTO.toString());
-        return null;
+    void updateCustomer(@RequestBody CustomerDTO customerDTO){
+        customerService.updateCustomer(customerDTO.getCustomerCode(),customerDTO);
     }
 
     @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    CustomerDTO deleteCustomer(@RequestBody CustomerDTO customerDTO){
-        System.out.println(customerDTO.toString());
-        return null;
+    void deleteCustomer(@RequestBody CustomerDTO customerDTO){
+        customerService.deleteCustomer(customerDTO.getCustomerCode());
+    }
+
+    @PatchMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    CustomerDTO getCustomer(@PathVariable("id") String id){
+        return customerService.getCustomerDetails(id);
     }
 }
