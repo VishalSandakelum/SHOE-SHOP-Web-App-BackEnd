@@ -36,7 +36,7 @@ public class JWTServiceImpl implements JWTService {
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("role",userDetails.getAuthorities());
         Date currentDate = new Date();
-        Date expiredDate = new Date(currentDate.getTime() + 1000 * 600);
+        Date expiredDate = new Date(currentDate.getTime() + 1000 * 60 * 60 * 24);
         String accessToken = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername()) // set the "subject" (sub) claim of the JWT

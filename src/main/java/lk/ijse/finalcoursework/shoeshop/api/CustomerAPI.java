@@ -46,7 +46,7 @@ public class CustomerAPI {
         customerService.deleteCustomer(customerDTO.getCustomerCode());
     }
 
-    @PatchMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     CustomerDTO getCustomer(@PathVariable("id") String id){
         return customerService.getCustomerDetails(id);
