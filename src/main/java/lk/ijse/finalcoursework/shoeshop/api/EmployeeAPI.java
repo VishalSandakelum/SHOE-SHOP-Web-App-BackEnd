@@ -41,6 +41,10 @@ public class EmployeeAPI {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     void updateEmployee(@RequestPart("data") EmployeeDTO employeeDTO,@RequestPart("profilepic")String profilepic){
+        String base64ProfilePic = Base64.getEncoder().encodeToString(profilepic.getBytes());
+        employeeDTO.setEmployeeProfilePic(
+                base64ProfilePic
+        );
         employeeService.updateEmployee(employeeDTO.getEmployeeCode(),employeeDTO);
     }
 
