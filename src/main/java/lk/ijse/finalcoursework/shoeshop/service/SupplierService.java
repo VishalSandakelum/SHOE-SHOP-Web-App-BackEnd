@@ -16,4 +16,5 @@ public interface SupplierService {
     SupplierDTO saveSupplier(SupplierDTO supplierDTO);
     void updateSupplier(String id, SupplierDTO supplierDTO);
     void deleteSupplier(String id);
+    String genarateNextSupplierCode();
 }

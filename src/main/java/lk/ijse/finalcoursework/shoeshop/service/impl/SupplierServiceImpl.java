@@ -30,6 +30,7 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public List<SupplierDTO> getAllSuppliers() {
+        System.out.println(genarateNextSupplierCode());
         return supplierRepository.findAll().stream().map(
                 supplier -> modelMapper.map(supplier, SupplierDTO.class)
         ).toList();
@@ -73,5 +74,14 @@ public class SupplierServiceImpl implements SupplierService {
             throw  new NotFoundException("Supplier ID"+ id + "Not Found...");
         }
         supplierRepository.deleteBySupplierCode(id);
+    }
+
+    @Override
+    public String genarateNextSupplierCode() {
+        String lastSupplierCode = supplierRepository.findLatestSupplierCode();
+        int numericPart = Integer.parseInt(lastSupplierCode.substring(3));
+        numericPart++;
+        String nextSupplierCode = "SUP" + String.format("%03d", numericPart);
+        return nextSupplierCode;
     }
 }
