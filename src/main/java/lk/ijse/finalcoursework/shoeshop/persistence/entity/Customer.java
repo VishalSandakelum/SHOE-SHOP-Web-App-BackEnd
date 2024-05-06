@@ -22,9 +22,6 @@ import java.util.Date;
 @Table(name = "customers")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "customer_code", unique = true, nullable = false)
     private String customerCode;
 
