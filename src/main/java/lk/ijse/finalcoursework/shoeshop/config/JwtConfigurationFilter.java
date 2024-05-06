@@ -9,6 +9,7 @@ import lk.ijse.finalcoursework.shoeshop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -46,6 +47,24 @@ public class JwtConfigurationFilter extends OncePerRequestFilter{
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    System.out.println(userDetails.getAuthorities());
+                    if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("Role_ADMIN"))) {
+                        // Print the request
+                        System.out.println("Request received from non-ADMIN user: " + request.getMethod() + " " + request.getRequestURI());
+
+                        if(request.getMethod().equals("GET")){
+                            System.out.println("Getting...");
+                        }else if(request.getMethod().equals("POST") & request.getRequestURI().equals("/app/api/v0/sales")){
+                            System.out.println("Processing...");
+                        }else{
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            String message = "{\"error\": \"You haven't Authorization to execute this process\"}";
+                            response.getWriter().write(message);
+                            return;
+                        }
+                    }
                 }
             }
         }
