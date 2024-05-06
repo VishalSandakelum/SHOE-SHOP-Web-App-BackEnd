@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author: Vishal Sandakelum,
  * @Runtime version: 11.0.11+9-b1341.60 amd64
@@ -54,4 +59,7 @@ public class Inventory {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy =  "inventory")
+    private List<SalesDetails> salesDetails = new ArrayList<>();
 }
