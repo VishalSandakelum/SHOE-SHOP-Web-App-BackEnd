@@ -39,8 +39,9 @@ public class Inventory {
     @Column(name = "size", nullable = false)
     private Integer size;
 
-    @Column(name = "supplier_code", nullable = false)
-    private String supplierCode;
+    @ManyToOne
+    @JoinColumn(name = "supplier_code" , referencedColumnName = "supplier_code")
+    private Supplier supplierCode;
 
     @Column(name = "supplier_name", nullable = false)
     private String supplierName;

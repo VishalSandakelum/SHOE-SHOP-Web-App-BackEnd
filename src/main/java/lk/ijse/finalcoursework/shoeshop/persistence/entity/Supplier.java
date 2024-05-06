@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author: Vishal Sandakelum,
  * @Runtime version: 11.0.11+9-b1341.60 amd64
@@ -50,4 +53,7 @@ public class Supplier {
 
     @Column(name = "contact_no1", nullable = false)
     private String contactNo1;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy =  "supplierName")
+    private List<Inventory> inventory = new ArrayList<>();
 }
