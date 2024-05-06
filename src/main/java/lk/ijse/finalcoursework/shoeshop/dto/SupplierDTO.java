@@ -40,7 +40,6 @@ public class SupplierDTO {
     private String addressLine06;
 
     @NotBlank(message = "Contact No.1 is required")
-    @Pattern(regexp = "^\\+?[0-9()-]+$", message = "Invalid contact number format")
-    @Pattern(regexp = "^\\d{10}$", message = "Invalid mobile number format. It should be 10 digits.")
+    @Pattern(regexp = "^\\+?[0-9()-]{1,11}$", message = "Invalid contact number format")
     private String contactNo1;
 }

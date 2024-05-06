@@ -38,7 +38,7 @@ public class CustomerDTO {
     private String addressLine04;
     private String addressLine05;
     @NotBlank(message = "Customer Contact Number Cannot Be Null")
-    @Pattern(regexp = "^\\+?[0-9()-]+$", message = "Contact Number not valid")
+    @Pattern(regexp = "^\\+?[0-9()-]{1,11}$", message = "Contact Number not valid")
     private String contactNo;
     @NotBlank(message = "Customer Email Cannot Be Null")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Email not valid")
