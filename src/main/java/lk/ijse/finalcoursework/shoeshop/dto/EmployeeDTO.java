@@ -64,6 +64,7 @@ public class EmployeeDTO {
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
     private String email;
 
+    private String emergencyContact;
     private String emergencyContactPerson;
 
 }
