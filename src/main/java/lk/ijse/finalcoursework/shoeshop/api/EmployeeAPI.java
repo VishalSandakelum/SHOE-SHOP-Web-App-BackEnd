@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v0/employees")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,RequestMethod.PATCH, RequestMethod.OPTIONS})
 public class EmployeeAPI {
     private final EmployeeService employeeService;
 

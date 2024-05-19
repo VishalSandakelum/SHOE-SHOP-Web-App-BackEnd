@@ -77,6 +77,9 @@ public class Employee {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "emergency_contact")
+    private String emergencyContact;
+
     @Column(name = "emergency_contact_person")
     private String emergencyContactPerson;
 }
