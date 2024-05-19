@@ -35,16 +35,16 @@ public class CustomerAPI {
         return customerService.saveCustomer(customerDTO);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void updateCustomer(@Valid @RequestBody CustomerDTO customerDTO){
-        customerService.updateCustomer(customerDTO.getCustomerCode(),customerDTO);
+    void updateCustomer(@Valid @RequestBody CustomerDTO customerDTO,@PathVariable("id") String id){
+        customerService.updateCustomer(id,customerDTO);
     }
 
-    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void deleteCustomer(@RequestBody CustomerDTO customerDTO){
-        customerService.deleteCustomer(customerDTO.getCustomerCode());
+    void deleteCustomer(@PathVariable("id") String id){
+        customerService.deleteCustomer(id);
     }
 
     @PatchMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)

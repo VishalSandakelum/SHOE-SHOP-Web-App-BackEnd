@@ -56,16 +56,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(String id, CustomerDTO customerDTO) {
-        Customer existingCustomer = customerRepository.findByCustomerCode(id);
-
-        if(existingCustomer.getCustomerName().isEmpty()){
+        if(!customerRepository.existsByCustomerCode(id)){
             throw new NotFoundException("Customer ID"+ id + "Not Found...");
         }
-
-        existingCustomer.setCustomerName(customerDTO.getCustomerName());
-        existingCustomer.setGender(customerDTO.getGender());
-
-        customerRepository.save(existingCustomer);
+        customerDTO.setCustomerCode(id);
+        customerRepository.save(modelMapper.map(customerDTO,Customer.class));
     }
 
     @Override
