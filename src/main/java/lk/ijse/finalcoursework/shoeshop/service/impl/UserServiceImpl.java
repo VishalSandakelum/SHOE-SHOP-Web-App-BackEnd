@@ -8,6 +8,7 @@ import lk.ijse.finalcoursework.shoeshop.persistence.repository.UserRepository;
 import lk.ijse.finalcoursework.shoeshop.service.UserService;
 import lk.ijse.finalcoursework.shoeshop.service.execption.DublicateRecordException;
 import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
+import lk.ijse.finalcoursework.shoeshop.util.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserDetails(String email,String role) {
+    public UserDTO getUserDetails(String email, Role role) {
         if(!userRepository.existsByEmail(email)){
             throw new NotFoundException("User email :"+email+" Not Found!");
         }
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(String email, UserDTO userDTO) {
-        User existingUser = userRepository.findByEmailAndRole(email, String.valueOf(userDTO.getRole()));
+        User existingUser = userRepository.findByEmailAndRole(email, userDTO.getRole());
 
         if(existingUser.getPassword().isEmpty()){
             throw new NotFoundException("User email :"+ email + "Not Found...");
