@@ -54,6 +54,12 @@ public class Supplier {
     @Column(name = "contact_no1", nullable = false)
     private String contactNo1;
 
+    @Column(name = "land_line_no", nullable = false)
+    private String landLineNo;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy =  "supplierName")
     private List<Inventory> inventory = new ArrayList<>();
 }
