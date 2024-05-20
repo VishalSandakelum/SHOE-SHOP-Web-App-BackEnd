@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v0/suppliers")
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,RequestMethod.PATCH, RequestMethod.OPTIONS})
 public class SupplierAPI {
     private final SupplierService supplierService;
 
