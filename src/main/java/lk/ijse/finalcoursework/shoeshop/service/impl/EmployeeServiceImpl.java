@@ -58,16 +58,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void updateEmployee(String id, EmployeeDTO employeeDTO) {
-        Employee existingEmployee = employeeRepository.findByEmployeeCode(id);
-
-        if(existingEmployee.getEmployeeName().isEmpty()){
+        if(!employeeRepository.existsByEmployeeCode(id)){
             throw new NotFoundException("Employee ID"+ id + "Not Found...");
         }
-
-        existingEmployee.setEmployeeName(employeeDTO.getEmployeeName());
-        existingEmployee.setGender(employeeDTO.getGender());
-
-        employeeRepository.save(existingEmployee);
+        employeeDTO.setEmployeeCode(id);
+        employeeRepository.save(modelMapper.map(employeeDTO,Employee.class));
     }
 
     @Override
