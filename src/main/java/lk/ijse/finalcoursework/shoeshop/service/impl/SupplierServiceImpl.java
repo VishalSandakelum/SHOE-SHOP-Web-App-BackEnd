@@ -56,16 +56,11 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public void updateSupplier(String id, SupplierDTO supplierDTO) {
-        Supplier existingSupplier = supplierRepository.findBySupplierCode(id);
-
-        if(existingSupplier.getSupplierCode().isEmpty()){
+        if(!supplierRepository.existsBySupplierCode(id)){
             throw new NotFoundException("Supplier ID"+ id + "Not Found...");
         }
-
-        existingSupplier.setSupplierName(supplierDTO.getSupplierName());
-        existingSupplier.setCategory(supplierDTO.getCategory());
-
-        supplierRepository.save(existingSupplier);
+        supplierDTO.setSupplierCode(id);
+        supplierRepository.save(modelMapper.map(supplierDTO,Supplier.class));
     }
 
     @Override
