@@ -61,6 +61,9 @@ public class Inventory {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy =  "inventory")
     private List<SalesDetails> salesDetails = new ArrayList<>();
 }

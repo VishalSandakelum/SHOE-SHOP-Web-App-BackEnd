@@ -59,4 +59,6 @@ public class InventoryDTO {
     @NotBlank(message = "Status is required")
     @Pattern(regexp = "^(low|available|not available)$", message = "Invalid status. Must be 'low', 'available', or 'not available'.")
     private String status;
+
+    private Integer quantity;
 }
