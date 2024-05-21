@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author: Vishal Sandakelum,
@@ -35,7 +32,7 @@ public class Sales {
     private Double totalPrice;
 
     @Column(name = "purchase_date")
-    private LocalDateTime purchaseDate;
+    private Date purchaseDate;
 
     @Column(name = "payment_method")
     private String paymentMethod;
