@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,10 +36,10 @@ public class SalesDTO {
     private Double totalPrice;
 
     @NotNull(message = "Purchase date is required")
-    private LocalDateTime purchaseDate;
+    private Date purchaseDate;
 
     @NotBlank(message = "Payment method is required")
-    @Pattern(regexp = "^(cash|card)$", message = "Invalid payment method. Must be 'cash' or 'card'.")
+    @Pattern(regexp = "^(CASH|CARD)$", message = "Invalid payment method. Must be 'cash' or 'card'.")
     private String paymentMethod;
 
     private Double addedPoints;

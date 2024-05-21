@@ -1,6 +1,7 @@
 package lk.ijse.finalcoursework.shoeshop.service.impl;
 
 import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
+import lk.ijse.finalcoursework.shoeshop.dto.InventoryDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.SalesDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.SalesInventoryDTO;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Customer;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: Vishal Sandakelum,
@@ -39,9 +41,22 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public List<SalesDTO> getAllSales() {
-        return salesRepository.findAll().stream().map(
-                sales -> modelMapper.map(sales, SalesDTO.class)
-        ).toList();
+        List<Sales> salesList = salesRepository.findAll();
+        return salesList.stream().map(sales -> {
+            SalesDTO salesDTO = modelMapper.map(sales, SalesDTO.class);
+
+            List<SalesDetails> salesDetailsList = salesDetailsRepository.findAllBySalesOrderNo(sales.getOrderNo());
+            List<SalesInventoryDTO> salesInventoryDTOList = salesDetailsList.stream()
+                    .map(details -> {
+                        SalesInventoryDTO salesInventoryDTO = modelMapper.map(details, SalesInventoryDTO.class);
+                        salesInventoryDTO.setInventory(modelMapper.map(details.getInventory(), InventoryDTO.class));
+                        return salesInventoryDTO;
+                    })
+                    .collect(Collectors.toList());
+
+            salesDTO.setInventory(salesInventoryDTOList);
+            return salesDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -70,8 +85,6 @@ public class SaleServiceImpl implements SaleService {
 
         List<SalesInventoryDTO> salesInventoryDTO = new ArrayList<>();
         for (SalesInventoryDTO inventoryDTO : salesDTO.getInventory()) {
-            /*System.out.println("------------------------");
-            System.out.println(inventoryDTO.getInventory());*/
             SalesDetails savedSaleDetails = salesDetailsRepository.save(modelMapper.map(inventoryDTO, SalesDetails.class));
             salesInventoryDTO.add(modelMapper.map(savedSaleDetails, SalesInventoryDTO.class));
         }
@@ -92,8 +105,10 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public void deleteSales(String id) {
-        if(!salesDetailsRepository.existsBySalesOrderNo(id)){
+        if(!salesDetailsRepository.existsBySalesOrderNo(id)&&!salesRepository.existsByOrderNo(id)){
             throw  new NotFoundException("Sales "+ id + "Not Found...");
+        }else if(salesRepository.existsByOrderNo(id)){
+            salesRepository.deleteByOrderNo(id);
         }
         salesDetailsRepository.deleteAllBySalesOrderNo(id);
         salesRepository.deleteByOrderNo(id);

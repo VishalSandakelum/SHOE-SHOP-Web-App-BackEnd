@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v0/sales")
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE,RequestMethod.PATCH, RequestMethod.OPTIONS})
 public class SalesAPI {
     private final SaleService saleService;
 
@@ -34,6 +35,7 @@ public class SalesAPI {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     SalesDTO saveSales(@Valid @RequestBody SalesDTO salesDTO){
+        System.out.println(salesDTO);
         return saleService.saveSales(salesDTO);
     }
 
