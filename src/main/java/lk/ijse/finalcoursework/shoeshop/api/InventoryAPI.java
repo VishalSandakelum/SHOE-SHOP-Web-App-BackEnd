@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
@@ -30,21 +32,31 @@ public class InventoryAPI {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    InventoryDTO saveInventory(@RequestPart("data") InventoryDTO inventoryDTO,@RequestPart("itempic")String itempic){
-        String base64ProfilePic = Base64.getEncoder().encodeToString(itempic.getBytes());
-        inventoryDTO.setItemPicture(
-                base64ProfilePic
-        );
+    InventoryDTO saveInventory(@RequestPart("data") InventoryDTO inventoryDTO,@RequestPart("itempic")MultipartFile itempic){
+        String base64ProfilePic = null;
+        try {
+            base64ProfilePic = Base64.getEncoder().encodeToString(itempic.getBytes());
+            inventoryDTO.setItemPicture(
+                    base64ProfilePic
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return inventoryService.saveInventory(inventoryDTO);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void updateInventory(@RequestPart("data") InventoryDTO inventoryDTO,@RequestPart("itempic")String itempic){
-        String base64ProfilePic = Base64.getEncoder().encodeToString(itempic.getBytes());
-        inventoryDTO.setItemPicture(
-                base64ProfilePic
-        );
+    void updateInventory(@RequestPart("data") InventoryDTO inventoryDTO,@RequestPart("itempic") MultipartFile itempic){
+        String base64ProfilePic = null;
+        try {
+            base64ProfilePic = Base64.getEncoder().encodeToString(itempic.getBytes());
+            inventoryDTO.setItemPicture(
+                    base64ProfilePic
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         inventoryService.updateInventory(inventoryDTO.getItemCode(),inventoryDTO);
     }
 

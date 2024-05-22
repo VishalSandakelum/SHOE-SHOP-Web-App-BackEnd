@@ -8,7 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
@@ -31,21 +37,31 @@ public class EmployeeAPI {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    EmployeeDTO saveEmployee(@RequestPart("data") EmployeeDTO employeeDTO,@RequestPart("profilepic")String profilepic){
-        String base64ProfilePic = Base64.getEncoder().encodeToString(profilepic.getBytes());
-        employeeDTO.setEmployeeProfilePic(
-                base64ProfilePic
-        );
+    EmployeeDTO saveEmployee(@RequestPart("data") EmployeeDTO employeeDTO,@RequestPart("profilepic") MultipartFile profilepic){
+        String base64ProfilePic = null;
+        try {
+            base64ProfilePic = Base64.getEncoder().encodeToString(profilepic.getBytes());
+            employeeDTO.setEmployeeProfilePic(
+                    base64ProfilePic
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return employeeService.saveEmployee(employeeDTO);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void updateEmployee(@RequestPart("data") EmployeeDTO employeeDTO,@RequestPart("profilepic")String profilepic){
-        String base64ProfilePic = Base64.getEncoder().encodeToString(profilepic.getBytes());
-        employeeDTO.setEmployeeProfilePic(
-                base64ProfilePic
-        );
+    void updateEmployee(@RequestPart("data") EmployeeDTO employeeDTO,@RequestPart("profilepic")MultipartFile profilepic){
+        String base64ProfilePic = null;
+        try {
+            base64ProfilePic = Base64.getEncoder().encodeToString(profilepic.getBytes());
+            employeeDTO.setEmployeeProfilePic(
+                    base64ProfilePic
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         employeeService.updateEmployee(employeeDTO.getEmployeeCode(),employeeDTO);
     }
 
@@ -59,5 +75,11 @@ public class EmployeeAPI {
     @ResponseStatus(HttpStatus.ACCEPTED)
     EmployeeDTO getEmployee(@PathVariable("id") String id){
         return employeeService.getEmployeeDetails(id);
+    }
+
+    @GetMapping("/nextid")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    String getNextEmployeeCode(){
+        return employeeService.nextEmployeeCode();
     }
 }

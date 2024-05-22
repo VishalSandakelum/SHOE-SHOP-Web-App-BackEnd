@@ -72,4 +72,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         employeeRepository.deleteByEmployeeCode(id);
     }
+
+    @Override
+    public String nextEmployeeCode() {
+        String lastEmployeeCode = employeeRepository.findLatestEmployeeCode();
+        if(lastEmployeeCode==null){lastEmployeeCode = "EM000";}
+        int numericPart = Integer.parseInt(lastEmployeeCode.substring(3));
+        numericPart++;
+        String nextEmployeeCode = "EM" + String.format("%03d", numericPart);
+        return nextEmployeeCode;
+    }
 }
