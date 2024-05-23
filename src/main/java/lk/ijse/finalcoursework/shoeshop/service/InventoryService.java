@@ -15,4 +15,5 @@ public interface InventoryService {
     InventoryDTO saveInventory(InventoryDTO inventoryDTO);
     void updateInventory(String id, InventoryDTO inventoryDTO);
     void deleteInventory(String id);
+    String nextInventoryCode(String code);
 }

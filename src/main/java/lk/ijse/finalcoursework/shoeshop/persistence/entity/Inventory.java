@@ -36,7 +36,7 @@ public class Inventory {
     @Column(name = "category", nullable = false)
     private String category;
 
-    @Column(name = "size", nullable = false)
+    @Column(name = "size")
     private Integer size;
 
     @ManyToOne

@@ -31,7 +31,6 @@ public class InventoryDTO {
     @Pattern(regexp = "^(International|Local)$", message = "Invalid category. Must be 'International' or 'Local'.")
     private String category;
 
-    @NotNull(message = "Size is required")
     @Pattern(regexp = "^[1-9][0-9]*$", message = "Invalid size format. Must be a positive integer.")
     private Integer size;
 

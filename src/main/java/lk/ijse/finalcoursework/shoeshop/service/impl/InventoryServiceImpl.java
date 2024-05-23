@@ -50,6 +50,8 @@ public class InventoryServiceImpl implements InventoryService {
         if(inventoryRepository.existsByItemCode(inventoryDTO.getItemCode())){
             throw new DublicateRecordException("This Inventory "+inventoryDTO.getItemCode()+" already exicts...");
         }
+        System.out.println(inventoryDTO.getItemCode());
+        inventoryDTO.setItemCode(nextInventoryCode(inventoryDTO.getItemCode()));
         return modelMapper.map(inventoryRepository.save(modelMapper.map(
                 inventoryDTO, Inventory.class)), InventoryDTO.class
         );
@@ -76,4 +78,15 @@ public class InventoryServiceImpl implements InventoryService {
         }
         inventoryRepository.deleteByItemCode(id);
     }
+
+    @Override
+    public String nextInventoryCode(String code) {
+        String lastInventoryCode = "IIM"+""+inventoryRepository.countInventoryRows();
+        if(lastInventoryCode==null){lastInventoryCode = code+"000";}
+        int numericPart = Integer.parseInt(lastInventoryCode.substring(3));
+        numericPart++;
+        String nextInventoryCode = code + String.format("%03d", numericPart);
+        return nextInventoryCode;
+    }
+
 }
