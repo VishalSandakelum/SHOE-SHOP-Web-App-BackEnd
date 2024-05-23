@@ -52,4 +52,10 @@ public class CustomerAPI {
     CustomerDTO getCustomer(@PathVariable("id") String id){
         return customerService.getCustomerDetails(id);
     }
+
+    @GetMapping("/nextid")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    String getNextEmployeeCode(){
+        return customerService.genarateNextCustomerCode();
+    }
 }
