@@ -56,4 +56,10 @@ public class SalesAPI {
     SalesDTO getSales(@PathVariable("id") String id){
         return saleService.getSaleDetails(id);
     }
+
+    @GetMapping("/nextordercode")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    String getNextOrderCode(){
+        return saleService.nextOrderCode();
+    }
 }

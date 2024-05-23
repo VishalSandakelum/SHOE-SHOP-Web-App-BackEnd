@@ -61,4 +61,6 @@ public class InventoryDTO {
     private String status;
 
     private Integer quantity;
+
+    private Integer pQuantity;
 }

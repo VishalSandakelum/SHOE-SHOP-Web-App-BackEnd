@@ -4,15 +4,14 @@ import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.InventoryDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.SalesDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.SalesInventoryDTO;
-import lk.ijse.finalcoursework.shoeshop.persistence.entity.Customer;
-import lk.ijse.finalcoursework.shoeshop.persistence.entity.Employee;
-import lk.ijse.finalcoursework.shoeshop.persistence.entity.Sales;
-import lk.ijse.finalcoursework.shoeshop.persistence.entity.SalesDetails;
+import lk.ijse.finalcoursework.shoeshop.persistence.entity.*;
+import lk.ijse.finalcoursework.shoeshop.persistence.repository.InventoryRepository;
 import lk.ijse.finalcoursework.shoeshop.persistence.repository.SalesDetailsRepository;
 import lk.ijse.finalcoursework.shoeshop.persistence.repository.SalesRepository;
 import lk.ijse.finalcoursework.shoeshop.service.SaleService;
 import lk.ijse.finalcoursework.shoeshop.service.execption.DublicateRecordException;
 import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
+import lk.ijse.finalcoursework.shoeshop.service.execption.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,12 +34,14 @@ import java.util.stream.Collectors;
 public class SaleServiceImpl implements SaleService {
     SalesRepository salesRepository;
     SalesDetailsRepository salesDetailsRepository;
+    InventoryRepository inventoryRepository;
     ModelMapper modelMapper;
 
-    public SaleServiceImpl(SalesRepository salesRepository, SalesDetailsRepository salesDetailsRepository, ModelMapper modelMapper) {
+    public SaleServiceImpl(SalesRepository salesRepository, SalesDetailsRepository salesDetailsRepository, ModelMapper modelMapper,InventoryRepository inventoryRepository) {
         this.salesRepository = salesRepository;
         this.salesDetailsRepository = salesDetailsRepository;
         this.modelMapper = modelMapper;
+        this.inventoryRepository = inventoryRepository;
     }
 
     @Override
@@ -78,24 +79,30 @@ public class SaleServiceImpl implements SaleService {
         return salesDTO;
     }
 
+    @Transactional
     @Override
     public SalesDTO saveSales(SalesDTO salesDTO) {
-        if(salesRepository.existsByOrderNo(salesDTO.getOrderNo())){
-            throw new DublicateRecordException("This Sales "+salesDTO.getOrderNo()+" already exicts...");
-        }
-        SalesDTO newsalesDTO = modelMapper.map(salesRepository.save(modelMapper.map(
-                salesDTO, Sales.class)), SalesDTO.class
-        );
+        if(maintainInventoryQuantity(salesDTO)){
+            if(salesRepository.existsByOrderNo(salesDTO.getOrderNo())){
+                throw new DublicateRecordException("This Sales "+salesDTO.getOrderNo()+" already exicts...");
+            }
+            SalesDTO newsalesDTO = modelMapper.map(salesRepository.save(modelMapper.map(
+                    salesDTO, Sales.class)), SalesDTO.class
+            );
 
-        List<SalesInventoryDTO> salesInventoryDTO = new ArrayList<>();
-        for (SalesInventoryDTO inventoryDTO : salesDTO.getInventory()) {
-            SalesDetails savedSaleDetails = salesDetailsRepository.save(modelMapper.map(inventoryDTO, SalesDetails.class));
-            salesInventoryDTO.add(modelMapper.map(savedSaleDetails, SalesInventoryDTO.class));
+            List<SalesInventoryDTO> salesInventoryDTO = new ArrayList<>();
+            for (SalesInventoryDTO inventoryDTO : salesDTO.getInventory()) {
+                SalesDetails savedSaleDetails = salesDetailsRepository.save(modelMapper.map(inventoryDTO, SalesDetails.class));
+                salesInventoryDTO.add(modelMapper.map(savedSaleDetails, SalesInventoryDTO.class));
+            }
+            newsalesDTO.setInventory(salesInventoryDTO);
+            return newsalesDTO;
+        }else {
+            return salesDTO;
         }
-        newsalesDTO.setInventory(salesInventoryDTO);
-        return newsalesDTO;
     }
 
+    @Transactional
     @Override
     public void updateSales(String id, SalesDTO salesDTO) {
         for(SalesInventoryDTO inventoryDTO : salesDTO.getInventory()){
@@ -131,11 +138,46 @@ public class SaleServiceImpl implements SaleService {
         salesRepository.deleteByOrderNo(id);
     }
 
+    @Override
+    public String nextOrderCode() {
+        String lastOrderCode = salesRepository.findLatestOrderCode();
+        if(lastOrderCode==null){lastOrderCode = "ORD0000";}
+        int numericPart = Integer.parseInt(lastOrderCode.substring(4));
+        numericPart++;
+        String nextOrderCode = "ORD" + String.format("%04d", numericPart);
+        return nextOrderCode;
+    }
+
     protected boolean isDateWithinThreeDays(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy");
         LocalDateTime inputDate = LocalDateTime.parse(dateString, formatter.withZone(ZoneId.of("Asia/Kolkata")));
         LocalDateTime currentDate = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
         LocalDateTime threeDaysAgo = currentDate.minus(3, ChronoUnit.DAYS);
         return !inputDate.isBefore(threeDaysAgo);
+    }
+
+    protected Boolean maintainInventoryQuantity(SalesDTO salesDTO){
+        boolean valid = false;
+        for (int i = 0; i<salesDTO.getInventory().size();i++){
+            SalesInventoryDTO inventoryDTO = salesDTO.getInventory().get(i);
+            String itemCode = inventoryDTO.getInventory().getItemCode();
+            System.out.println(itemCode);
+
+            InventoryDTO inventory = modelMapper.map(inventoryRepository.findByItemCode(itemCode),InventoryDTO.class);
+            if(inventory.getQuantity()>0){
+                if(inventory.getQuantity()-inventoryDTO.getQuantity()>=0){
+                    inventory.setQuantity(inventory.getQuantity()-inventoryDTO.getQuantity());
+                    inventoryRepository.save(modelMapper.map(inventory, Inventory.class));
+                    valid = true;
+                }else{
+                    valid = false;
+                    throw new ServiceException("Can't Proceed this Sale ."+inventory.getItemDescription()+" No much Quantity");
+                }
+            }else{
+                valid = false;
+                throw new ServiceException("Can't Proceed this Sale ."+inventory.getItemDescription()+" No much Quantity");
+            }
+        }
+        return valid;
     }
 }

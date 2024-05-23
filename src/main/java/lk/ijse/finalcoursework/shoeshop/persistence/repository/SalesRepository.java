@@ -2,6 +2,7 @@ package lk.ijse.finalcoursework.shoeshop.persistence.repository;
 
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Sales;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * @author: Vishal Sandakelum,
@@ -12,4 +13,6 @@ public interface SalesRepository extends JpaRepository<Sales,String> {
     Boolean existsByOrderNo(String id);
     Sales findByOrderNo(String id);
     void deleteByOrderNo(String id);
+    @Query(value = "SELECT order_no FROM Sales ORDER BY order_no DESC LIMIT 1", nativeQuery = true)
+    String findLatestOrderCode();
 }
