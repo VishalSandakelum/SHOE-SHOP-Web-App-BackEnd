@@ -53,4 +53,10 @@ public class SupplierAPI {
     SupplierDTO getSupplier(@PathVariable("id") String id){
         return supplierService.getSupplierDetails(id);
     }
+
+    @GetMapping("/nextid")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    String getNextSupplierCode(){
+        return supplierService.genarateNextSupplierCode();
+    }
 }
