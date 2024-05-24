@@ -4,6 +4,10 @@ import lk.ijse.finalcoursework.shoeshop.persistence.entity.Sales;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+
 /**
  * @author: Vishal Sandakelum,
  * @Runtime version: 11.0.11+9-b1341.60 amd64
@@ -13,6 +17,9 @@ public interface SalesRepository extends JpaRepository<Sales,String> {
     Boolean existsByOrderNo(String id);
     Sales findByOrderNo(String id);
     void deleteByOrderNo(String id);
+    List<Sales> findAllByPurchaseDate(Date date);
+    @Query("SELECT o.purchaseDate FROM Sales o")
+    List<Date>findAllPurchaseDate();
     @Query(value = "SELECT order_no FROM Sales ORDER BY order_no DESC LIMIT 1", nativeQuery = true)
     String findLatestOrderCode();
 }

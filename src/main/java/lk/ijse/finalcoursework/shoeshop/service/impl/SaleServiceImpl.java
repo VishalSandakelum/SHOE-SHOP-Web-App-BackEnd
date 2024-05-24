@@ -16,12 +16,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +48,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public List<SalesDTO> getAllSales() {
+        getWeeklyProfit();
         List<Sales> salesList = salesRepository.findAll();
         return salesList.stream().map(sales -> {
             SalesDTO salesDTO = modelMapper.map(sales, SalesDTO.class);
@@ -179,5 +182,85 @@ public class SaleServiceImpl implements SaleService {
             }
         }
         return valid;
+    }
+
+    public void getWeeklyProfit(){
+        Map<String, Double> dataList = new HashMap<>();
+        List<Date> dates = salesRepository.findAllPurchaseDate();
+        int quantity;
+        double dayProfit = 0;
+        for (Date date:dates){
+            if(convertToLocalDateFormat(String.valueOf(date))){
+                List<Sales> sales = salesRepository.findAllByPurchaseDate(date);
+                for (int i = 0; i < sales.size(); i++) {
+                    List<SalesDetails> salesDetailsArray = salesDetailsRepository.findAllBySalesOrderNo(sales.get(i).getOrderNo());
+                    for (int j = 0; j < salesDetailsArray.size(); j++){
+                        System.out.println("----------------------------------------------------------------");
+                        quantity = salesDetailsArray.get(j).getQuantity();
+                        InventoryDTO inventoryDTO = modelMapper.map(
+                                inventoryRepository.findByItemCode(salesDetailsArray.get(j).getInventory().getItemCode()),InventoryDTO.class
+                        );
+                        dayProfit += quantity*(inventoryDTO.getExpectedProfit());
+                    }
+                    System.out.println("////////////////////////////////////////////////////////////////");
+                    System.out.println(date);
+                    System.out.println(dayProfit);
+                    if(dayProfit!=0){
+                        String newdate = convertDateFormat(String.valueOf(date));
+                        if (!dataList.containsKey(newdate)) {
+                            dataList.put(newdate, dayProfit);
+                        } else {
+                            double currentProfit = dataList.get(newdate);
+                            dataList.put(newdate, currentProfit + dayProfit);
+                        }
+                    }
+                    dayProfit = 0;
+                }
+            }
+        }
+        System.out.println(dataList);
+    }
+
+    private Boolean convertToLocalDateFormat(String dateTimeString){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString, dateTimeFormatter);
+        LocalDate localDate = localDateTime.toLocalDate();
+
+        Boolean purchaseDateEqualToWeeklyDate = checkWeeklyDate(localDate.format(dateFormatter));
+        return purchaseDateEqualToWeeklyDate;
+    }
+
+    private boolean checkWeeklyDate(String purchasedate){
+        List<LocalDate> dates = new ArrayList<>();
+        Boolean vaid = false;
+        LocalDate today = LocalDate.now();
+
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            dates.add(date);
+        }
+
+        L:for (LocalDate date : dates) {
+            if(String.valueOf(date).equals(purchasedate)){
+                vaid = true;
+                break L;
+            }else{
+                vaid = false;
+            }
+        }
+        return vaid;
+    }
+
+    private String convertDateFormat(String inputDateStr) {
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+        Date inputDate = null;
+        try {
+            inputDate = inputDateFormat.parse(inputDateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat outputDateFormatObj = new SimpleDateFormat("yyyy-MM-dd");
+        return outputDateFormatObj.format(inputDate);
     }
 }
