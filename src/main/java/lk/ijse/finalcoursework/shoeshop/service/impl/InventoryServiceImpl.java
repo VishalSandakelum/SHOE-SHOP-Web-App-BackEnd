@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: Vishal Sandakelum,
@@ -141,34 +138,17 @@ public class InventoryServiceImpl implements InventoryService {
                 TodaySaleInventoryDetails.add(getTodaySaleInventoryDetails.get(i));
             }
         }
-        System.out.println(TodaySaleInventoryDetails.get(0).getQuantity());
+        TodaySaleInventoryDetails = sortAsSaleItemsQuantity(TodaySaleInventoryDetails);
+        for(int i = 0; i <TodaySaleInventoryDetails.size(); i++){
+            System.out.println(TodaySaleInventoryDetails.get(i).getQuantity());
+        }
 
         return null;
     }
 
     private List<SalesInventoryDTO> sortAsSaleItemsQuantity(List<SalesInventoryDTO> list){
-        List<SalesInventoryDTO>TodaySaleInventoryDetails = list;
-        List<SalesInventoryDTO>randomList = new ArrayList<SalesInventoryDTO>();
-
-        for(int i = 0; i < list.size(); i++){
-            if(randomList.size()==0){
-                randomList.add(TodaySaleInventoryDetails.get(i));
-            }else{
-                IL:for(int j = randomList.size(); j > 0; j--){
-                    if(randomList.get(j).getQuantity()>=TodaySaleInventoryDetails.get(i).getQuantity()){
-                        randomList.add(randomList.indexOf(randomList.get(j))+1,
-                                TodaySaleInventoryDetails.get(i));
-                        break IL;
-                    }else if(randomList.get(j).getQuantity()<TodaySaleInventoryDetails.get(i).getQuantity()){
-                        randomList.add(randomList.indexOf(randomList.get(j))-1,
-                                TodaySaleInventoryDetails.get(i));
-                        break IL;
-                    }
-                }
-            }
-        }
-        TodaySaleInventoryDetails = randomList;
-        return  TodaySaleInventoryDetails;
+        list.sort(Comparator.comparingInt(SalesInventoryDTO::getQuantity));
+        return list;
     }
 
 }

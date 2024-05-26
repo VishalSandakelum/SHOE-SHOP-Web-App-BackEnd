@@ -48,7 +48,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public List<SalesDTO> getAllSales() {
-        getWeeklyProfit();
+        //getWeeklyProfit();
         List<Sales> salesList = salesRepository.findAll();
         return salesList.stream().map(sales -> {
             SalesDTO salesDTO = modelMapper.map(sales, SalesDTO.class);
