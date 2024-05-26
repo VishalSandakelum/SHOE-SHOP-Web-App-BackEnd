@@ -3,6 +3,7 @@ package lk.ijse.finalcoursework.shoeshop.persistence.repository;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Sales;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -22,4 +23,6 @@ public interface SalesRepository extends JpaRepository<Sales,String> {
     List<Date>findAllPurchaseDate();
     @Query(value = "SELECT order_no FROM Sales ORDER BY order_no DESC LIMIT 1", nativeQuery = true)
     String findLatestOrderCode();
+    @Query(value = "SELECT * FROM sales s WHERE DATE(s.purchase_date) = :today", nativeQuery = true)
+    List<Sales> findTodaySales(@Param("today") String today);
 }

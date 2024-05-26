@@ -2,9 +2,14 @@ package lk.ijse.finalcoursework.shoeshop.service.impl;
 
 import lk.ijse.finalcoursework.shoeshop.dto.EmployeeDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.InventoryDTO;
+import lk.ijse.finalcoursework.shoeshop.dto.SalesInventoryDTO;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Employee;
 import lk.ijse.finalcoursework.shoeshop.persistence.entity.Inventory;
+import lk.ijse.finalcoursework.shoeshop.persistence.entity.Sales;
+import lk.ijse.finalcoursework.shoeshop.persistence.entity.SalesDetails;
 import lk.ijse.finalcoursework.shoeshop.persistence.repository.InventoryRepository;
+import lk.ijse.finalcoursework.shoeshop.persistence.repository.SalesDetailsRepository;
+import lk.ijse.finalcoursework.shoeshop.persistence.repository.SalesRepository;
 import lk.ijse.finalcoursework.shoeshop.service.InventoryService;
 import lk.ijse.finalcoursework.shoeshop.service.execption.DublicateRecordException;
 import lk.ijse.finalcoursework.shoeshop.service.execption.NotFoundException;
@@ -12,7 +17,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Vishal Sandakelum,
@@ -23,15 +32,20 @@ import java.util.List;
 @Transactional
 public class InventoryServiceImpl implements InventoryService {
     InventoryRepository inventoryRepository;
+    SalesRepository salesRepository;
+    SalesDetailsRepository salesDetailsRepository;
     ModelMapper modelMapper;
 
-    public InventoryServiceImpl(InventoryRepository inventoryRepository, ModelMapper modelMapper) {
+    public InventoryServiceImpl(InventoryRepository inventoryRepository, ModelMapper modelMapper, SalesRepository salesRepository, SalesDetailsRepository salesDetailsRepository) {
         this.inventoryRepository = inventoryRepository;
         this.modelMapper = modelMapper;
+        this.salesRepository = salesRepository;
+        this.salesDetailsRepository = salesDetailsRepository;
     }
 
     @Override
     public List<InventoryDTO> getAllInventory() {
+        getMostSaleItem();
         return inventoryRepository.findAll().stream().map(
                 inventory -> modelMapper.map(inventory, InventoryDTO.class)
         ).toList();
@@ -87,6 +101,74 @@ public class InventoryServiceImpl implements InventoryService {
         numericPart++;
         String nextInventoryCode = code + String.format("%03d", numericPart);
         return nextInventoryCode;
+    }
+
+    public InventoryDTO getMostSaleItem(){
+        List<Sales>getAllTodaySales;
+        List<SalesInventoryDTO>getTodaySaleInventoryDetails = new ArrayList<>();
+        List<SalesInventoryDTO>TodaySaleInventoryDetails = new ArrayList<>();
+        Boolean notFound = false;
+        LocalDate today = LocalDate.now();
+        getAllTodaySales = salesRepository.findTodaySales(String.valueOf(today));
+        System.out.println(getAllTodaySales.get(0).getOrderNo());
+        for(int i = 0; i<getAllTodaySales.size(); i++){
+            List<SalesInventoryDTO>getOneOrderSalesDetails = salesDetailsRepository.findAllBySalesOrderNo(getAllTodaySales.get(i).getOrderNo()).stream().map(
+                    salesDetails -> modelMapper.map(salesDetails, SalesInventoryDTO.class)
+            ).toList();
+            for(SalesInventoryDTO salesInventoryDTO:getOneOrderSalesDetails){
+                getTodaySaleInventoryDetails.add(salesInventoryDTO);
+            }
+        }
+        System.out.println(getTodaySaleInventoryDetails.size());
+        for(int i = 0; i<getTodaySaleInventoryDetails.size(); i++){
+            if(TodaySaleInventoryDetails.size()>0) {
+                L:for (int j = 0; j < TodaySaleInventoryDetails.size(); j++) {
+                    if(getTodaySaleInventoryDetails.get(i).getInventory().getItemCode().equals(
+                            TodaySaleInventoryDetails.get(j).getInventory().getItemCode()
+                    )){
+                        System.out.println("comming!");
+                        TodaySaleInventoryDetails.get(j).setQuantity(
+                                TodaySaleInventoryDetails.get(j).getQuantity()+getTodaySaleInventoryDetails.get(i).getQuantity()
+                        );
+                        notFound = false;
+                        break L;
+                    }else {notFound = true;}
+                }
+                if(notFound){
+                    TodaySaleInventoryDetails.add(getTodaySaleInventoryDetails.get(i));
+                }
+            }else{
+                TodaySaleInventoryDetails.add(getTodaySaleInventoryDetails.get(i));
+            }
+        }
+        System.out.println(TodaySaleInventoryDetails.get(0).getQuantity());
+
+        return null;
+    }
+
+    private List<SalesInventoryDTO> sortAsSaleItemsQuantity(List<SalesInventoryDTO> list){
+        List<SalesInventoryDTO>TodaySaleInventoryDetails = list;
+        List<SalesInventoryDTO>randomList = new ArrayList<SalesInventoryDTO>();
+
+        for(int i = 0; i < list.size(); i++){
+            if(randomList.size()==0){
+                randomList.add(TodaySaleInventoryDetails.get(i));
+            }else{
+                IL:for(int j = randomList.size(); j > 0; j--){
+                    if(randomList.get(j).getQuantity()>=TodaySaleInventoryDetails.get(i).getQuantity()){
+                        randomList.add(randomList.indexOf(randomList.get(j))+1,
+                                TodaySaleInventoryDetails.get(i));
+                        break IL;
+                    }else if(randomList.get(j).getQuantity()<TodaySaleInventoryDetails.get(i).getQuantity()){
+                        randomList.add(randomList.indexOf(randomList.get(j))-1,
+                                TodaySaleInventoryDetails.get(i));
+                        break IL;
+                    }
+                }
+            }
+        }
+        TodaySaleInventoryDetails = randomList;
+        return  TodaySaleInventoryDetails;
     }
 
 }
