@@ -42,7 +42,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryDTO> getAllInventory() {
-        getMostSaleItem();
+        //getMostSaleItem();
         return inventoryRepository.findAll().stream().map(
                 inventory -> modelMapper.map(inventory, InventoryDTO.class)
         ).toList();
@@ -100,14 +100,14 @@ public class InventoryServiceImpl implements InventoryService {
         return nextInventoryCode;
     }
 
-    public InventoryDTO getMostSaleItem(){
+    public List<SalesInventoryDTO> getMostSaleItem(){
         List<Sales>getAllTodaySales;
         List<SalesInventoryDTO>getTodaySaleInventoryDetails = new ArrayList<>();
         List<SalesInventoryDTO>TodaySaleInventoryDetails = new ArrayList<>();
         Boolean notFound = false;
         LocalDate today = LocalDate.now();
         getAllTodaySales = salesRepository.findTodaySales(String.valueOf(today));
-        System.out.println(getAllTodaySales.get(0).getOrderNo());
+        //System.out.println(getAllTodaySales.get(0).getOrderNo());
         for(int i = 0; i<getAllTodaySales.size(); i++){
             List<SalesInventoryDTO>getOneOrderSalesDetails = salesDetailsRepository.findAllBySalesOrderNo(getAllTodaySales.get(i).getOrderNo()).stream().map(
                     salesDetails -> modelMapper.map(salesDetails, SalesInventoryDTO.class)
@@ -143,7 +143,7 @@ public class InventoryServiceImpl implements InventoryService {
             System.out.println(TodaySaleInventoryDetails.get(i).getQuantity());
         }
 
-        return null;
+        return TodaySaleInventoryDetails;
     }
 
     private List<SalesInventoryDTO> sortAsSaleItemsQuantity(List<SalesInventoryDTO> list){

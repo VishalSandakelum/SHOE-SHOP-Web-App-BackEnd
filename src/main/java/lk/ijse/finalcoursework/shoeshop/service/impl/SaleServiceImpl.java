@@ -161,6 +161,7 @@ public class SaleServiceImpl implements SaleService {
 
     protected Boolean maintainInventoryQuantity(SalesDTO salesDTO){
         boolean valid = false;
+        int quantity;
         for (int i = 0; i<salesDTO.getInventory().size();i++){
             SalesInventoryDTO inventoryDTO = salesDTO.getInventory().get(i);
             String itemCode = inventoryDTO.getInventory().getItemCode();
@@ -169,7 +170,15 @@ public class SaleServiceImpl implements SaleService {
             InventoryDTO inventory = modelMapper.map(inventoryRepository.findByItemCode(itemCode),InventoryDTO.class);
             if(inventory.getQuantity()>0){
                 if(inventory.getQuantity()-inventoryDTO.getQuantity()>=0){
-                    inventory.setQuantity(inventory.getQuantity()-inventoryDTO.getQuantity());
+                    quantity = inventory.getQuantity()-inventoryDTO.getQuantity();
+                    inventory.setQuantity(quantity);
+                    if(quantity>100){
+                        inventory.setStatus("available");
+                    }else if(quantity<=100){
+                        inventory.setStatus("low");
+                    }else if(quantity==0){
+                        inventory.setStatus("not");
+                    }
                     inventoryRepository.save(modelMapper.map(inventory, Inventory.class));
                     valid = true;
                 }else{

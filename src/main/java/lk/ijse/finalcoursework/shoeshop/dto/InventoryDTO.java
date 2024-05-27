@@ -56,7 +56,7 @@ public class InventoryDTO {
     private Double profitMargin;
 
     @NotBlank(message = "Status is required")
-    @Pattern(regexp = "^(low|available|not available)$", message = "Invalid status. Must be 'low', 'available', or 'not available'.")
+    @Pattern(regexp = "^(low|available|not)$", message = "Invalid status. Must be 'low', 'available', or 'not available'.")
     private String status;
 
     private Integer quantity;
