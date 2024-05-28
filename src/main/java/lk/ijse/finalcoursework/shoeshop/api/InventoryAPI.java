@@ -74,8 +74,7 @@ public class InventoryAPI {
     }
 
     @GetMapping("/mostsaleitem")
-    List<SalesInventoryDTO> getMostSaleInvetory(){
-        System.out.println(inventoryService.getMostSaleItem());
+    List<InventoryDTO> getMostSaleInvetory(){
         return inventoryService.getMostSaleItem();
     }
 }

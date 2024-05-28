@@ -42,7 +42,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryDTO> getAllInventory() {
-        //getMostSaleItem();
+        manageStatus();
         return inventoryRepository.findAll().stream().map(
                 inventory -> modelMapper.map(inventory, InventoryDTO.class)
         ).toList();
@@ -75,11 +75,8 @@ public class InventoryServiceImpl implements InventoryService {
         if(existingInventory.getItemCode().isEmpty()){
             throw new NotFoundException("Inventory "+ id + "Not Found...");
         }
-
-        existingInventory.setItemDescription(inventoryDTO.getItemDescription());
-        existingInventory.setItemPicture(inventoryDTO.getItemPicture());
-
-        inventoryRepository.save(existingInventory);
+        inventoryDTO.setItemCode(id);
+        inventoryRepository.save(modelMapper.map(inventoryDTO,Inventory.class));
     }
 
     @Override
@@ -100,7 +97,7 @@ public class InventoryServiceImpl implements InventoryService {
         return nextInventoryCode;
     }
 
-    public List<SalesInventoryDTO> getMostSaleItem(){
+    public List<InventoryDTO> getMostSaleItem(){
         List<Sales>getAllTodaySales;
         List<SalesInventoryDTO>getTodaySaleInventoryDetails = new ArrayList<>();
         List<SalesInventoryDTO>TodaySaleInventoryDetails = new ArrayList<>();
@@ -116,6 +113,7 @@ public class InventoryServiceImpl implements InventoryService {
                 getTodaySaleInventoryDetails.add(salesInventoryDTO);
             }
         }
+        System.out.println("/////////////////");
         System.out.println(getTodaySaleInventoryDetails.size());
         for(int i = 0; i<getTodaySaleInventoryDetails.size(); i++){
             if(TodaySaleInventoryDetails.size()>0) {
@@ -139,16 +137,40 @@ public class InventoryServiceImpl implements InventoryService {
             }
         }
         TodaySaleInventoryDetails = sortAsSaleItemsQuantity(TodaySaleInventoryDetails);
-        for(int i = 0; i <TodaySaleInventoryDetails.size(); i++){
+        List<InventoryDTO>invetorys = new ArrayList<>();
+        for(int i = TodaySaleInventoryDetails.size()-1; i >=0; i--){
+            System.out.println(TodaySaleInventoryDetails.get(i).getInventory());
+            invetorys.add(TodaySaleInventoryDetails.get(i).getInventory());
             System.out.println(TodaySaleInventoryDetails.get(i).getQuantity());
         }
 
-        return TodaySaleInventoryDetails;
+        return invetorys;
     }
 
     private List<SalesInventoryDTO> sortAsSaleItemsQuantity(List<SalesInventoryDTO> list){
         list.sort(Comparator.comparingInt(SalesInventoryDTO::getQuantity));
         return list;
+    }
+
+    private void manageStatus(){
+        InventoryDTO inventoryDTO;
+        List<InventoryDTO>inventorys =  inventoryRepository.findAll().stream().map(
+                inventory -> modelMapper.map(inventory, InventoryDTO.class)
+        ).toList();
+
+        for(int i = 0; i < inventorys.size(); i++){
+            inventoryDTO = inventorys.get(i);
+            if(inventorys.get(i).getQuantity()>=100){
+                inventoryDTO.setStatus("Available");
+            }else if(inventorys.get(i).getQuantity()<100 & inventorys.get(i).getQuantity()>0){
+                inventoryDTO.setStatus("Low");
+            }else if(inventorys.get(i).getQuantity()==0){
+                inventoryDTO.setStatus("Not");
+            }
+            modelMapper.map(inventoryRepository.save(modelMapper.map(
+                    inventoryDTO, Inventory.class)), InventoryDTO.class
+            );
+        }
     }
 
 }
