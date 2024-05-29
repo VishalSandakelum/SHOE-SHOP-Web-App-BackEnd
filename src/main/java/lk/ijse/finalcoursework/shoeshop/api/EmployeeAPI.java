@@ -82,4 +82,10 @@ public class EmployeeAPI {
     String getNextEmployeeCode(){
         return employeeService.nextEmployeeCode();
     }
+
+    @GetMapping("/dob")
+    @ResponseStatus(HttpStatus.CREATED)
+    List<EmployeeDTO>getAllEmployeesOrderByDob(){
+        return employeeService.findAllEmployeesOrderByDob();
+    }
 }

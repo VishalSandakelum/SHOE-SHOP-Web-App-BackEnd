@@ -13,6 +13,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -81,5 +83,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         numericPart++;
         String nextEmployeeCode = "EM" + String.format("%03d", numericPart);
         return nextEmployeeCode;
+    }
+
+    @Override
+    public List<EmployeeDTO> findAllEmployeesOrderByDob() {
+        LocalDate today = LocalDate.now();
+        Date sqlDate = Date.valueOf(today);
+        System.out.println(sqlDate);
+        List<EmployeeDTO>emp = employeeRepository.findEmployeesWithBirthdaysTodayAndAfter().stream().map(
+                employee -> modelMapper.map(employee, EmployeeDTO.class)
+        ).toList();
+        for (EmployeeDTO employeeDTO :emp) {
+            System.out.println(employeeDTO.getDob());
+        }
+        return employeeRepository.findEmployeesWithBirthdaysTodayAndAfter().stream().map(
+                employee -> modelMapper.map(employee, EmployeeDTO.class)
+        ).toList();
     }
 }
