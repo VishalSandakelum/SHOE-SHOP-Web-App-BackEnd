@@ -231,6 +231,11 @@ public class SaleServiceImpl implements SaleService {
         return dataList;
     }
 
+    @Override
+    public Double getMonthlyRevenue() {
+        return salesRepository.getCurrentMonthTotalRevenue();
+    }
+
     private Boolean convertToLocalDateFormat(String dateTimeString){
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

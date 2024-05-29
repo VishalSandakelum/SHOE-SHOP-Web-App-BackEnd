@@ -69,4 +69,10 @@ public class SalesAPI {
     Map<String, Double> getWeeklyProfit(){
         return saleService.getWeeklyProfit();
     }
+
+    @GetMapping("/monthlyprofit")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Double getMonthlRevenue(){
+        return saleService.getMonthlyRevenue();
+    }
 }

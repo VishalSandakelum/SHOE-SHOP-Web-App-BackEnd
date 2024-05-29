@@ -19,4 +19,5 @@ public interface SaleService {
     void deleteSales(String id);
     String nextOrderCode();
     Map<String, Double> getWeeklyProfit();
+    Double getMonthlyRevenue();
 }

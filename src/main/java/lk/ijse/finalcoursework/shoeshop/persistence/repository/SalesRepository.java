@@ -25,4 +25,6 @@ public interface SalesRepository extends JpaRepository<Sales,String> {
     String findLatestOrderCode();
     @Query(value = "SELECT * FROM sales s WHERE DATE(s.purchase_date) = :today", nativeQuery = true)
     List<Sales> findTodaySales(@Param("today") String today);
+    @Query(value = "SELECT COALESCE(SUM(total_price), 0) FROM sales WHERE MONTH(purchase_date) = MONTH(CURRENT_DATE()) AND YEAR(purchase_date) = YEAR(CURRENT_DATE())", nativeQuery = true)
+    Double getCurrentMonthTotalRevenue();
 }
