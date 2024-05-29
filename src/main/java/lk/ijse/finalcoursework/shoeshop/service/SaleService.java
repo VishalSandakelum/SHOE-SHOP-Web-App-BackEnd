@@ -4,6 +4,7 @@ import lk.ijse.finalcoursework.shoeshop.dto.CustomerDTO;
 import lk.ijse.finalcoursework.shoeshop.dto.SalesDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Vishal Sandakelum,
@@ -17,4 +18,5 @@ public interface SaleService {
     void updateSales(String id, SalesDTO salesDTO);
     void deleteSales(String id);
     String nextOrderCode();
+    Map<String, Double> getWeeklyProfit();
 }

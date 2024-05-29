@@ -48,7 +48,6 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public List<SalesDTO> getAllSales() {
-        //getWeeklyProfit();
         List<Sales> salesList = salesRepository.findAll();
         return salesList.stream().map(sales -> {
             SalesDTO salesDTO = modelMapper.map(sales, SalesDTO.class);
@@ -193,11 +192,12 @@ public class SaleServiceImpl implements SaleService {
         return valid;
     }
 
-    public void getWeeklyProfit(){
+    public Map<String, Double> getWeeklyProfit(){
         Map<String, Double> dataList = new HashMap<>();
-        List<Date> dates = salesRepository.findAllPurchaseDate();
+        List<Date> dates = new ArrayList<>();
         int quantity;
         double dayProfit = 0;
+        dates = salesRepository.findAllPurchaseDate();
         for (Date date:dates){
             if(convertToLocalDateFormat(String.valueOf(date))){
                 List<Sales> sales = salesRepository.findAllByPurchaseDate(date);
@@ -228,6 +228,7 @@ public class SaleServiceImpl implements SaleService {
             }
         }
         System.out.println(dataList);
+        return dataList;
     }
 
     private Boolean convertToLocalDateFormat(String dateTimeString){
